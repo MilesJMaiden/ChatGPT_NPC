@@ -5,6 +5,12 @@ using OpenAI;
 using UnityEngine.Events;
 public class ChatGPTManager : MonoBehaviour
 {
+    [TextArea(5,20)]
+    public string personality;
+    [TextArea(5, 20)]
+    public string scene;
+    public int maxResponseWordLimit = 15;
+
     public OnResponseEvent OnResponse;
 
     [System.Serializable]
@@ -13,10 +19,30 @@ public class ChatGPTManager : MonoBehaviour
     private OpenAIApi openAI = new OpenAIApi();
     private List<ChatMessage> messages = new List<ChatMessage>();
 
+    public string GetInstructions()
+    {
+        string instructions = "You are a non-player character. You must answer a player's asked message. \n" +
+        "You must reply to the players message strictly using the information defined in your personality and scene. These will be provided below \n" +
+        "Do not invent or generate responses outside of the context of the conversation as it relates to defined personality and or scene \n" +
+        "You must not under any circumstance mention you are an AI or a video game character \n" +
+
+        "The words in your responses must not exceed" + maxResponseWordLimit + "words. \n" +
+
+        "Here is the information about your Personality : \n" +
+        personality + "\n" +
+
+        "Here is the information about the Scene around you : \n" +
+        scene + "/n" +
+
+        "Here is the message of the player : \n";
+
+        return instructions;
+    }
+
     public async void AskChatGPT(string newText)
     {
         ChatMessage newMessage = new ChatMessage();
-        newMessage.Content = newText;
+        newMessage.Content = GetInstructions() + newText;
         newMessage.Role = "user";
 
         messages.Add(newMessage);
