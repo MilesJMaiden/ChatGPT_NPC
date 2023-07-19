@@ -11,6 +11,16 @@ public class ChatGPTManager : MonoBehaviour
     public string scene;
     public int maxResponseWordLimit = 15;
 
+    public List<NPCAction> actions;
+
+    [System.Serializable]
+    public struct NPCAction
+    {
+        public string actionKeyword;
+        [TextArea(2,5)]
+        public string actionDescription;
+    }
+
     public OnResponseEvent OnResponse;
 
     [System.Serializable]
@@ -34,9 +44,24 @@ public class ChatGPTManager : MonoBehaviour
         "Here is the information about the Scene around you : \n" +
         scene + "/n" +
 
+        BuildActionInstructions() +
+
         "Here is the message of the player : \n";
 
         return instructions;
+    }
+
+    public string BuildActionInstructions()
+    {
+        string instruction = "";
+
+        foreach (var item in actions)
+        {
+            instruction += "If I imply that I want you to do the following : " + item.actionDescription
+                + ". You must add your answer to the following keyword : " + item.actionKeyword + "\n";
+        }
+
+        return instruction;
     }
 
     public async void AskChatGPT(string newText)
